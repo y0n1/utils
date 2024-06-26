@@ -10,7 +10,7 @@
             "type": "node",
             "cwd": "${workspaceFolder}",
             "env": {},
-            "runtimeExecutable": "/usr/local/bin/deno",
+            "runtimeExecutable": "deno",
             "runtimeArgs": [
                 "test",
                 "--inspect-brk",
