@@ -1,5 +1,6 @@
 {
   "workspaces": [
-    "./packages/json"
+    "./packages/json",
+    "./packages/tasks"
   ]
 }
