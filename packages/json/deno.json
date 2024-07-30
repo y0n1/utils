@@ -1,9 +1,9 @@
 {
   "name": "@y0n1/json",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "exports": {
-    "./deep-map-keys": "./deep_map_keys.ts",
-    "./type-guards": "./type_guards.ts",
-    "./types": "./types.ts"
+    "./deep-map-keys": "./public/deep_map_keys.ts",
+    "./type-guards": "./public/type_guards.ts",
+    "./types": "./public/types.ts"
   }
 }

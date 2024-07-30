@@ -5,8 +5,8 @@ import {
   assertThrows,
 } from "jsr:@std/assert";
 import camelCase from "npm:lodash/camelCase.js";
-import { deepMapKeys } from "./deep_map_keys.ts";
-import type { JsonArray } from "./types.ts";
+import { deepMapKeys } from "../public/deep_map_keys.ts";
+import type { JsonArray } from "../public/types.ts";
 
 Deno.test("deepMapKeys", async (t) => {
   await t.step({
@@ -109,7 +109,7 @@ Deno.test("deepMapKeys", async (t) => {
 
   await t.step({
     ignore: false,
-    name: "should transform the keys of nested objects in JsonArrays",
+    name: "should transform the keys of nested objects into JSON arrays",
     fn: () => {
       const jsonArray = [
         {
@@ -169,7 +169,7 @@ Deno.test("deepMapKeys", async (t) => {
 
   await t.step({
     ignore: false,
-    name: "should omit keys listed in the skip list",
+    name: "should omit keys matching patterns in the skip list",
     fn: () => {
       const KEY1 = "some-very weird:key";
       const KEY2 = "2024-07-30T05:13:15.416Z";
@@ -186,12 +186,12 @@ Deno.test("deepMapKeys", async (t) => {
       };
 
       const skipList = [
-        `first_key.second_key.third_key."${KEY1}"`,
-        `first_key.second_key."${KEY2}"`,
+        /first_key\.second_key\.third_key\."some-very weird:key"$/,
+        /first_key\.second_key\."2024-07-30T05:13:15\.416Z"$/,
       ];
 
       const result = deepMapKeys(subject, camelCase, skipList);
-      assertEquals(result, {
+      const expected = {
         firstKey: {
           secondKey: {
             thirdKey: {
@@ -200,13 +200,14 @@ Deno.test("deepMapKeys", async (t) => {
             [KEY2]: { itemValue: 43 },
           },
         },
-      });
+      };
+      assertEquals(result, expected);
     },
   });
 
   await t.step({
     ignore: false,
-    name: "should omit keys listed in the skip list for JSONArrays",
+    name: "should omit keys listed in the skip list for JSON arrays",
     fn: () => {
       const KEY1 = "some-very weird:key";
       const KEY2 = "2024-07-30T05:13:15.416Z";
@@ -223,12 +224,12 @@ Deno.test("deepMapKeys", async (t) => {
       }];
 
       const skipList = [
-        `[0].first_key.second_key.third_key."${KEY1}"`,
-        `[0].first_key.second_key."${KEY2}"`,
+        /\[0\]\.first_key\.second_key\.third_key\."some-very weird:key"$/,
+        /\[0\]\.first_key\.second_key\."2024-07-30T05:13:15\.416Z"$/,
       ];
 
       const result = deepMapKeys(subject, camelCase, skipList);
-      assertEquals(result, [{
+      const expected = [{
         firstKey: {
           secondKey: {
             thirdKey: {
@@ -237,7 +238,9 @@ Deno.test("deepMapKeys", async (t) => {
             [KEY2]: { itemValue: 43 },
           },
         },
-      }]);
+      }];
+
+      assertEquals(result, expected);
     },
   });
 
@@ -260,7 +263,7 @@ Deno.test("deepMapKeys", async (t) => {
         },
       }];
 
-      const skipList = [""];
+      const skipList = [/""/];
 
       const result = deepMapKeys(subject, camelCase, skipList);
       assertEquals(result, [{
@@ -278,7 +281,7 @@ Deno.test("deepMapKeys", async (t) => {
 
   await t.step({
     ignore: false,
-    name: "Should work with the 2nd example from the docs",
+    name: "should work with the 2nd example from the docs",
     fn: () => {
       const subject = [{
         dates_data: {
@@ -286,13 +289,13 @@ Deno.test("deepMapKeys", async (t) => {
           "2024-08-30T05:02:01.000Z": { item_value: 43 },
         },
       }];
-      const skipList = ['[0].dates_data."2024-07-30T05:00:00.000Z"'];
+      const skipList = [/"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z"$/];
       const result = deepMapKeys(subject, camelCase, skipList);
 
       const expected = [{
         datesData: {
           "2024-07-30T05:00:00.000Z": { itemValue: 42 },
-          "20240830T050201000Z": { itemValue: 43 },
+          "2024-08-30T05:02:01.000Z": { itemValue: 43 },
         },
       }];
 
