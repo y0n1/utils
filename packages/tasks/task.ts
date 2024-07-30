@@ -23,15 +23,15 @@ export class Task<TFulfilled, TRejected extends Error> {
         this.#name = options?.name;
     }
 
-    get status() {
+    get status(): TaskStatus {
         return this.#status;
     }
 
-    get id() {
+    get id(): UUID {
         return this.#id;
     }
 
-    get name() {
+    get name(): string | undefined {
         return this.#name;
     }
 
